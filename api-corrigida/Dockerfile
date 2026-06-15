@@ -1,13 +1,10 @@
-FROM eclipse-temurin:21-jdk AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
+# Copy only what is needed for dependency resolution first
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-RUN chmod +x mvnw
-# Download dependencies
-RUN ./mvnw dependency:go-offline -B
 COPY src src
-RUN ./mvnw package -DskipTests
+# Build the application using the maven image (no mvnw required)
+RUN mvn -B package -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
